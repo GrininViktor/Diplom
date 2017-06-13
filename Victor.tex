@@ -1,0 +1,367 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=2.5cm, right=2cm, bottom=1.5cm, top=2cm]{geometry}
+\usepackage{indentfirst}
+\usepackage{tikz}
+
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\dpd}[2]{\dfrac{\partial #1}{\partial #2}}
+
+\newcommand{\pdd}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\pddd}[3]{\frac{\partial^2 #1}{\partial #2\partial #3}}
+
+\renewcommand{\arraystretch}{1.2}
+
+\let\dividesymbol\div
+\renewcommand{\div}{\operatorname{div}}
+\newcommand{\grad}{\operatorname{grad}}
+\newcommand{\rot}{\operatorname{rot}}
+\newcommand{\const}{\operatorname{const}}
+\newcommand{\diag}{\operatorname{diag}}
+\renewcommand{\vec}[1]{\boldsymbol{\mathbf{#1}}}
+\newcommand{\ten}[1]{\mathbf{#1}}
+\newcommand{\cutefrac}[2]{{}^{#1}\mkern-5mu/{\!}_#2}
+\newcommand{\half}{{\cutefrac{1}{2}}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+
+\begin{document}
+\textbf{{\large Билет 11}}
+\section{Задача}
+Для уравнения $u_{tt}=c^2u_{xx} + f$ составить схему на шаблоне \quad\tikz {
+\draw (0,0) --  ++(1,0) -- +(1,0) -- +(0,0)-- +(0,-1) -- +(-1,-1)-- +(1,-1)--+(0,-1)--+(0,1);
+\fill[black] (0,0) circle (1mm);<br>
+\fill[black] (1,0) circle (1mm);<br>
+\fill[black] (2,0) circle (1mm);<br>
+\fill[black] (0,-1) circle (1mm);<br>
+\fill[black] (1,-1) circle (1mm);<br>
+\fill[black] (2,-1) circle (1mm);<br>
+\fill[black] (1,1) circle (1mm);<br>
+} 
+
+\begin{flushleft}
+и исследовать аппроксимацию и устойчивость. Устойчивость исследовать 2-мя способами: методом гармоник и операторным методом, предварительно записав схему в канонической форме. 
+\end{flushleft}
+
+\subsection{Рассмотрим вопрос об аппроксимации.}
+
+$$u_{tt} = c^2u_{xx} + f \Rightarrow \frac{u_i^{j+1}- 2u_i^j + u_i^{j-1}}{\tau^2} = c^2\left( \sigma\frac{u_{i+1}^j- 2u_i^j + u_{i-1}^j}{h^2} + (1-\sigma)\frac{u_{i+1}^{j-1}- 2u_i^{j-1} + u_{i-1}^{j-1}}{h^2}\right)  + \varphi_i^j$$
+В более компактном виде 
+$$ u_{\bar{t}t} = c^2(\sigma u_{\bar{x}x} + (1-\sigma)\check{u}_{\bar{x}x})  + \varphi \hspace{0.5cm}(*)$$
+Разложим все вхождения функции в ряд Тейлора в окрестности точки (i, j).
+
+\begin{flushleft}
+Получим
+\end{flushleft}
+$$ u_{tt} + o(\tau^2) = c^2(\sigma u_{xx} + (1-\sigma)\check{u}_{xx} + o(h^2)) $$
+или $$ u_{tt} + o(\tau^2) = c^2(\sigma u_{xx} + (1-\sigma)u_{xx} - (1-\sigma)u_{xxt} + o(h^2 + \tau^2)) $$
+
+$$u_{tt} - c^2u_{xx} = (\sigma - 1)u_{xxt} + o(h^2 + \tau^2) = o(h^2 + \tau)\text{ в случае }\sigma\neq 1$$
+(при $\sigma =1$ получаем схему крест, имеющую аппроксимацию $o(h^2 + \tau^2)$, но это всё таки другой шаблон)
+
+\subsection{Рассмотрим вопрос об устойчивость схемы.}
+
+\subsubsection{Метод разделения переменных.}
+	 
+Будем искать решение численной задачи в виде $$u = T(t)*X(x)$$
+Подставляя в $(*)$ и полагая $\varphi = 0$, получаем $$X\frac{\hat{T}-2T +\check{T}}{\tau^2} = c^2\Lambda(\sigma TX+(1-\sigma)\check{T}X)$$ $$\frac{\hat{T}-2T +\check{T}}{c^2\tau^2(\sigma T - (1-\sigma)\check{T})} = \frac{\Lambda X}{X} = -\lambda $$
+На X имеем задачу Штурма-Лиувиля(доп.$ X(0) = X(1) = 0$), решение которой хорошо известно. 
+
+Для временной функции полагаем $$\hat{T} = qT , \quad\check{T} = \frac{1}{q}T$$
+Покажем, что при определённом выборе $\sigma$ выполнено $|q_{k}|\leqslant 1$, т.е схема устойчива.
+
+
+ На q имеем уравнение
+ $$q - 2 + \frac{1}{q} = -\lambda c^2\tau^2(\sigma +(1-\sigma)\frac{1}{q}),$$
+					 $$q^2-2q+1 = -\lambda c^2\tau^2(\sigma(q-1) + 1),$$
+					 $$q^2+(\lambda c^2\tau^2\sigma-2)q+1+(1-\sigma)\lambda c^2\tau^2 = 0,$$
+					 $$D = (\lambda c^2\tau^2\sigma-2)^2 -4 - 4(1-\sigma)\lambda c^2\tau^2 = $$
+					 $$= (\lambda c^2\tau^2\sigma)^2 - 4\lambda c^2\tau^2; $$
+
+
+Если $\sigma \leqslant\frac{2}{\sqrt{\lambda}\tau c} $, то $ D\leqslant 0$, и мы имеем два комплексно-сопряженных корня, по модулю равных $\sqrt{1+(1-\sigma)\lambda c^2\tau^2}$.
+
+Отсюда получаем $ |q_{k}| \leqslant 1 $, при  $ 1\leqslant\sigma \leqslant \frac{2}{\sqrt{\lambda_{k}}\tau c}$ и, учитывая $\lambda_k \leqslant \frac{4}{h^2}$, условие устойчивости $1\leqslant\sigma \leqslant \frac{h}{\tau c}$.
+
+Т.о мы показали, что при числе куранта $\delta =\frac{c^2\tau^2}{h^2}\leqslant1$, можно так выбрать $\sigma$, что схема будет устойчивой (при $\sigma = 1$ опять же получаем устойчивую схему крест)
+
+
+\subsubsection{Операторный метод.}
+$${u_i^{j+1}- 2u_i^j + u_i^{j-1}} = \delta(\sigma(u_{i+1}^j- 2u_i^j + u_{i-1}^j) + (1-\sigma)(u_{i+1}^{j-1}- 2u_i^{j-1} + u_{i-1}^{j-1})) + \tau^2\varphi_i^j,$$ 
+$$u_i^{j+1} - \delta\sigma u_{i+1}^j + 2(\delta\sigma - 1)u_i^j - \delta\sigma u_{i-1}^j - \delta (1-\sigma)u_{i+1}^{j-1} + (1+2\delta(1-\sigma))2u_i^{j-1} - \delta (1-\sigma)u_{i-1}^{j-1}= \tau^2\varphi_i^j,$$
+
+Или в матричном виде 
+
+$$B_0\hat{u}+B_1u+B_2\check{u} = \tau\varphi,$$
+
+где $$ B_0 = \tau^{-1}E,\quad B_1 = \tau^{-1}\begin{vmatrix}
+2(\delta\sigma-1) & -\delta\sigma & 0 & 0&.\\
+-\delta\sigma & 2(\delta\sigma-1) & -\delta\sigma&0&.\\
+.&.&.&.&.\\
+.&.&0&-\delta\sigma & 2(\delta\sigma - 1)
+\end{vmatrix}
+$$
+$$B_2 = \tau^{-1}\begin{vmatrix}
+1 + 2\delta(1-\sigma) & -\delta(1-\sigma) & 0 & 0&.\\
+-\delta(1-\sigma)  & 1 + 2\delta(1-\sigma)& -\delta(1-\sigma) &.\\
+.&.&.&.&.\\
+.&.&0&-\delta(1-\sigma) & 1 + 2\delta(1-\sigma)
+\end{vmatrix}
+$$
+
+Перепишем трёхслойную схему в канонической форме
+$$B\frac{\hat{u} - \check{u}}{2\tau} + R(\hat{u} - 2u + \check{u}) + Au = \varphi$$\\
+
+Здесь $$B = B_0 - B_2 = \frac{1}{\tau}\begin{vmatrix}
+- 2\delta(1-\sigma) & \delta(1-\sigma) & 0 & 0&.\\
+\delta(1-\sigma)  & - 2\delta(1-\sigma)& \delta(1-\sigma) &.\\
+.&.&.&.&.\\
+.&.&0&\delta(1-\sigma) & - 2\delta(1-\sigma)
+\end{vmatrix}$$
+$$R = \frac{1}{2\tau}(B_0 + B_2) = \frac{1}{2\tau^2} \begin{vmatrix}
+2 + 2\delta(1-\sigma) & -\delta(1-\sigma) & 0 & 0&.\\
+-\delta(1-\sigma)  & 2 + 2\delta(1-\sigma)& -\delta(1-\sigma) &.\\
+.&.&.&.&.\\
+.&.&0&-\delta(1-\sigma) & 2 + 2\delta(1-\sigma)
+\end{vmatrix}
+$$
+$$A = \frac{1}{\tau}(B_0 + B_1 + B_2) = \frac{1}{\tau^2} \begin{vmatrix}
+2\delta & -\delta& 0 & 0&.\\
+-\delta & 2\delta & -\delta&0&.\\
+.&.&.&.&.\\
+.&.&0&-\delta & 2\delta
+\end{vmatrix}
+$$
+
+
+
+ $$R - \frac{1}{4}A = \frac{1}{2\tau^2}\begin{vmatrix}
+2 + \delta - 2\delta\sigma & -\frac{\delta}{2} + \delta\sigma & 0 & 0&.\\
+-\frac{\delta}{2} + \delta \sigma & 2 + \delta - 2\delta\sigma  & -\frac{\delta}{2} + \delta\sigma & .\\
+.&.&.&.&.\\
+.&.&0&-\frac{\delta}{2} + \delta\sigma & 2 + \delta - 2\delta\sigma 
+\end{vmatrix}$$
+
+
+
+Далее при $a\geq0$ рассмотрим вопрос о положительной определённости матрицы  $$\ M  = \begin{vmatrix}
+a & \pm1 & 0 & 0&.\\
+\pm1 & a & \pm1 & .\\
+.&.&.&.&.\\
+.&.&0&\pm1&a 
+\end{vmatrix}$$
+
+Главные миноры такой матрицы находятся из рекуррентного соотношения 
+$$\Delta_k = a\Delta_{k-1} - \Delta_{k-2}, \quad \Delta_0 = 1,\quad \Delta_{-1} = 0 $$
+
+Решим эту рекурренту $$\lambda^2= a\lambda-1$$
+$$\lambda_1 = \frac{a+\sqrt{a^2-4}}{2},\quad\lambda_2 = \frac{a-\sqrt{a^2-4}}{2}$$
+$$\Delta_k = c_1\lambda_1^k + c_2\lambda_2^k$$
+
+Используя $ \Delta_0 = 1$,\quad$ \Delta_{-1} = 0 $ находим $c_1$ и $c_2$
+$$c_1+c_2 = 1, \quad \frac{c1}{c2}= -\frac{\lambda_1}{\lambda_2}$$
+ $$c_1 =\frac{\lambda_1}{\lambda_1-\lambda_2},  \quad c_2 = \frac{\lambda_2}{\lambda_2-\lambda_1}$$
+ 
+По Критерию Сильвестра $M > 0$ т. и т.т, когда все  $\Delta_k > 0$.
+Найдём ограничения на $a$ для выполнения этого равенства при всех k.
+
+\begin{flushleft}
+1. a > 2;
+\end{flushleft}
+$$
+\frac{\lambda_1^{k+1}}{\lambda_1-\lambda_2} + \frac{\lambda_2^{k+1}}{\lambda_2-\lambda_1} > 0$$
+$$\lambda_1^{k+1} - \lambda_2^{k+1}>0$$
+$$\lambda_1>\lambda_2$$
+что выполнено при всех рассматриваемых a.
+
+\begin{flushleft}
+2. a < 2;
+\end{flushleft}
+$$\Delta_k = \frac{\lambda_1^{k+1}}{\lambda_1-\bar{\lambda}_1} - \frac{\bar{\lambda}_1^{k+1}}{\lambda_1-\bar{\lambda}_1}, \quad \text{т. к.}\quad\lambda_2 = \bar{\lambda}_1\text{(комплексно сопряжены)}$$
+подставляя $\lambda_1 = |r|e^{i\varphi}$, получаем 
+$$\Delta_k = \frac{|r|}{Im\lambda_1}\frac{e^{i(k+1)\varphi} - e^{-i(k+1)\varphi}}{2i} = \frac{|r|}{Im\lambda_1}\sin{(k+1)\varphi}$$
+видим, что в этом случае $\Delta_k < 0$ при некоторых $k$.
+
+\begin{flushleft}
+3. a = 2;
+\end{flushleft}
+$$\Delta_k = c_1 k + c_2$$
+$$c_2 = 1,\quad c_1 = 1 $$
+$$\Delta_k = k + 1 > 0, \quad \text{при всех } k > 0$$
+После этого заключаем, что
+\begin{flushleft}
+1. $A > 0,$
+
+2. $B\geq 0$ , при $ \sigma\geq1,$
+
+3. $R > 0$, при  $-2 - \frac{2}{\delta(1-\sigma)}\geq 2,$
+
+4. $R - \frac{1}{4}A > 0$ , при $2(\frac{1}{-\frac{\delta}{2} + \delta\sigma}-1)\geq2\Rightarrow \sigma\leq \frac{1}{2} + \frac{1}{2\delta},$
+
++ очевидно $A=A^{*}, R=R^{*}$;
+\end{flushleft}
+ 
+Получаем достаточное условие  устойчивости по начальным данным    $$ 1\leq\sigma\leq\frac{1}{2}+\frac{1}{2\delta}$$
+
+Которое можно удовлетворить при том же $\delta\leq1$, что и в методе разделения переменных. 
+
+Кроме того при выполнение условий, записанных выше, схема оказывается устойчивой и по правой части. 
+
+$$\|Y(t+\tau)\|\leq \|Y(\tau)\| + M_2\max_{\tau < t^{`} \leq t}{(\| \varphi(t^{`})\|_{A^{-1}} + \| \varphi_{\bar{t}}(t^{`})\|_{A^{-1}})}$$
+
+\section{Задача.} 
+Привести к каноническому виду схему 
+$$ 2\gamma y_i^{j+1} = (\gamma-\frac{1}{2})(y_{i-1}^{j+1} + y_{i+1}^{j+1}) +\frac{1}{2}(y_{i-1}^j+ y_{i+1}^j), \quad \gamma = \frac{\tau}{h^2}$$
+и исследовать её устойчивость. Устойчивость исследовать 2-мя способами: методом гармоник и операторным методом, предварительно записав схему в канонической форме. Сформулировать корректные начальные и граничные условия для разностной задачи. Предложить метод решения разностной задачи и сформулировать достаточные условия его устойчивости.
+
+\subsection{Рассмотрим устойчивость схемы.}
+
+\subsubsection{Метод гармоник.}
+
+Запишем уравнение для погрешностей решения
+$$ 2\gamma \delta y_i^{j+1} = (\gamma-\frac{1}{2})(\delta y_{i-1}^{j+1} + \delta y_{i+1}^{j+1}) +\frac{1}{2}(\delta y_{i-1}^j + \delta y_{i+1}^j), \quad \gamma = \frac{\tau}{h^2}$$
+Гармоники $\delta y_{n,q}^j$ и $\delta y_{n,q}^{j+1}$ на слоях $j$ и $j+1$ связаны соотношениями
+$$\delta y_{n,q}^{j+1} = \lambda_q\delta y_{n,q}^j, \quad \delta y_{n,q}^j = C_q(t_j)e^{iqhn}$$
+Подставляя в уравнение получаем
+$$2\gamma\lambda_q = (\gamma - \frac{1}{2})(\lambda_q e^{-iqh} + \lambda_q e^{igh}) + \frac{1}{2}(e^{-iqh} + e^{iqh})$$
+$$\lambda_q = \frac{e^{-iqh} + e^{iqh}}{4\gamma +(1 - 2\gamma)(e^{-iqh} + e^{iqh})} = \frac{\cos{qh}}{2\gamma +(1 - 2\gamma)\cos{qh}}$$
+Потребуем, чтобы особенность функции $\frac{-2\gamma}{1-2\gamma}$ не лежала на $[-1;1]$. Для этого  $\gamma > \frac{1}{4}$.
+
+\begin{flushleft}
+ Т.к $\lambda_q(\cos{qh}) = \lambda_q(x)\text{ возрастает при } x\in [-1,1]$, 
+ $$\lambda_q ^{'}(x) = \frac{2\gamma}{(2\gamma +(1-2\gamma)x)^2} > 0$$
+\begin{flushleft}
+получаем
+\end{flushleft}
+ \end{flushleft} $$\lambda_q \in [\frac{1}{1-4\gamma}, 1]$$
+Условие устойчивости счемы выполнено, если 
+$$\frac{1}{1-4\gamma}\geq -1, \quad \gamma > \frac{1}{4}$$
+или $$\gamma = \frac{\tau}{h^2} \geq \frac{1}{2}$$
+
+\subsubsection{Операторный метод}
+Запишем схему в матричном виде
+$$B_0\hat{y}+B_1 y = 0$$
+где $$B_0 = \begin{vmatrix}
+2\gamma & \frac{1}{2} - \gamma & 0 & 0&.\\
+\frac{1}{2} - \gamma & 2\gamma  & \frac{1}{2} - \gamma & .\\
+.&.&.&.&.\\
+.&.&0&\frac{1}{2} - \gamma &2\gamma  
+\end{vmatrix} \quad B_1 = \begin{vmatrix}
+0 & -\frac{1}{2} & 0 & 0&.\\
+-\frac{1}{2} & 0 & -\frac{1}{2} & .\\
+.&.&.&.&.\\
+.&.&0&-\frac{1}{2} & 0
+\end{vmatrix}$$
+или в канонической форме
+$$B\frac{\hat{y}-y}{\tau} + Ay = 0$$
+$$B = B_0, \quad A = \frac{B_0+B_1}{\tau} = \frac{1}{\tau}\begin{vmatrix}
+2\gamma & - \gamma & 0 & 0&.\\
+- \gamma & 2\gamma  & - \gamma & .\\
+.&.&.&.&.\\
+.&.&0& - \gamma &2\gamma  
+\end{vmatrix}$$
+$$B-\frac{\tau}{2}A = \frac{1}{2}\begin{vmatrix}
+2\gamma & 1 - \gamma & 0 & 0&.\\
+1 - \gamma & 2\gamma  & 1 - \gamma & .\\
+.&.&.&.&.\\
+.&.&0& 1 - \gamma &2\gamma  
+\end{vmatrix}$$
+Сразу видим, что $A=A^{*}>0$ и $B = B^{*}$.
+\begin{flushleft}
+ 
+Для выполнения
+  $B -\frac{\tau}{2}A>0$ требуем \end{flushleft}
+$$\frac{\gamma}{1 - \gamma}\geq 1 ,\quad 1 - \gamma\geq0 \text{ или }-\frac{\gamma}{1 - \gamma}\geq 1, \quad -(1-\gamma)\geq 0$$
+$$2\gamma - 1\geq 0 ,\quad 1 - \gamma\geq0 \text{ или } 1\geq 0, \quad -(1-\gamma)\geq 0$$
+откуда
+$$\gamma\geq \frac{1}{2}$$
+При этом выполняется и $B>0$.
+
+Т.о при $\gamma\geq \frac{1}{2}$ схема устойчива по начальным данным в норме операторов $A$ и $B$. 
+
+Это условие совпадают с полученными в методе гармоник.
+
+\subsection{Решении разностной задачи.}
+$$B\hat{y} = (B - \tau A)y \quad (*)$$
+Предполагается, что мы решаем задачу в некоторой(прямоугольной) области. Тогда мы должны задать начальные условия ($\text{в т. }(0, i)\text{ при } 0\leq i \leq N_x)$ и граничные условия $(\text{в т. }(j, 0)\text{ и }(j, N_x)\text{ при }0\leq j\leq N_t)$. Что и понятно, т.к рассматриваемая схема $$\Lambda\hat{y} = \frac{1}{2}((y_{t})_{j+1} + (y_{t})_{j-1})$$ аппроксимирует уравнение теплопроводности.
+
+Рассмотрим например холодный стержень, у которого на левом конце поддерживается постоянная температура.
+\begin{align*}
+&y_i^0 = 0, \quad 0 < i < N_x\\
+&y_0^j = y_0,\quad 0 \leq j \leq N_t\\
+&y_L^j = 0, \quad 0 \leq j \leq N_t
+\end{align*}
+Значения $y$ на 1-м и всех последующих слоях по времени, рассчитываются по $(*)$, где справа в равенстве стоит известный вектор.
+Для этого используется методом прогонки, который в данном случае будет устойчивым т.к матрица $B$ имеет диагональное преобладание.
+
+Действительно, для неё: $a1 + a2 + a3 = 1$
+
+Будем рассматривать смешанную задачу для линейного однородного уравнения теплопроводности:
+
+$$
+    \frac{\partial u}{\partial t} = \kappa \frac{\partial^2 u}{\partial x^2}
+$$
+
+$$
+    u(x, 0) = u_0(x), \quad u(0, t) = b_l(t), \quad u(1, t) = b_r(t)
+$$
+
+
+$$
+    0 \leq x \leq 1
+$$
+
+$$
+    0 \leq t \leq T.
+$$
+
+
+Для нахождения численного решения проведем дискретизацию только по пространственной переменной - временной займемся позже. Введем расчетную сетку по пространству:
+
+$$ 
+    G_h = \left( x_i : x_i = i h; i = 0,...,n; h = \frac{1}{n} \right) 
+$$
+
+В узлах сетки будем рассматривать динамику значений функции-решения $ \left[ U_i(t) \right]_{i=0}^{n}$, которые теперь выступают в качестве неизвестных. Для приближения пространственной производной при $x = i h, \, \forall t$ воспользуемся стандартной разностной формулой 2-го порядка точности, в которой используются значения $U_{i-1}(t), U_i(t), U_{i+1}(t)$ на соседних прямых:
+
+$$
+    \frac{d U_i(t)}{d t} = \kappa \frac{U_{i+1}(t) - 2 U_i(t) + U_{i-1}(t)}{h^2}, \quad i = 1,...,n-1, \quad \forall t
+$$
+
+Таким образом, мы получили систему ОДУ с вектором неизвестных $\left[U_i \right]_{i=1}^{n-1}$, матрицей $A$ и вектором правой части $\left[F_i\right]_{i = 1}^{n}$:
+
+$$
+    \frac{d U(t)}{dt} = A U(t) + F(t)
+$$
+
+$$
+    A = \frac{\kappa}{h^2} 
+    \begin{pmatrix} -2 & 1 &  
+                    \\ 1 & -2 & 1 
+                    \\ & 1 & -2 & 1 
+                    \\ & & 1 & -2 & 1
+                    \\ & & & \ddots & \ddots & \ddots
+                    \\ & & & & 1 & -2
+    \end{pmatrix}
+$$
+
+$$
+    F(t) = \frac{\kappa}{h^2} 
+    \begin{pmatrix} 
+    b_l(t)
+    \\ 0
+    \\ 0
+    \\ 0
+    \\ \vdots 
+    \\ b_r(t)
+    \end{pmatrix} \text{- вспомогательный вектор для учета граничных условий.}
+$$
+
+К полученной системе теперь можно применять как аналитические, так численные методы решения. Способ численного решения УрЧП, основанный на приближенном сведении последнего к системе ОДУ, называется методом прямых.
+
+
+\end{document}
