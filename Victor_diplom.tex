@@ -13,6 +13,15 @@
 \usepackage{listings}
 \usepackage{graphicx}
 
+\usepackage{algpseudocode}
+\usepackage{eqparbox}
+
+\newcounter{algorithmic}
+\newenvironment{myalgorithmic}[1][0]{\stepcounter{algorithmic}\begin{algorithmic}[#1]}{\end{algorithmic}}
+\algrenewcommand{\algorithmiccomment}[1]{\hfill%
+\eqparbox{COMMENT\thealgorithmic}{$\quad\rhd$\hspace{.5em}#1}%
+}
+
 \newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
 \newcommand{\dpd}[2]{\dfrac{\partial #1}{\partial #2}}
 
@@ -147,27 +156,43 @@ $$\begin{array}{|c|cccc|c|}
 
 Для решения системы, которая описывает установление химического равновесия, использовался метод Ньютона. Были рассмотренные различные способы записи данной системы и был выбран оптимальный.
 
+\subsection{Метод Ньютона с ограничением шага}
+
 Запишем приведённую раньше систему в матричной форме$$\vec{F}(\vec \xi) = \ln{\vec{K}} + V^T \ln{(\vec{N}^0 + V\vec \xi)} = 0$$
 Продифференцируем эту функцию по $\vec \xi$
 $$\frac{\partial \vec{F}}{\partial{\vec{\xi}}} = V^T\diag^{-1}(\vec{N}^0 + V\vec{\xi})V$$
 
-Метод Ньютона принимает вид
+Метод Ньютона с принимает вид
 $$\vec{\xi}^{k+1} = \vec{\xi}^{k} - \alpha^{(k)}[V^T\diag^{-1}(\vec{N}^0 + V\vec{\xi})V]^{-1}(\ln{\vec{K}} + V^T \ln{(\vec{N}^0 + V\vec{\xi})}) \quad (1)$$
 Для обычного метода Ньютона параметр $\alpha$ следует брать равным единице, однако итерации с $\alpha^{(k)} = 1$ могут привести к попаданию в область нефизических значений. В этом случае можно делать лишь часть шага метода Ньютона, выбирая параметр $\alpha$ из промежутка $[0, 1]$.   
 
 При применении данного метода для численных расчётов возникает несколько проблем. Нужно выбирать начальное приближение $\vec{\xi}^0$ так, чтобы выражение под логарифмом было положительным $\vec{N}^0 + V\vec{\xi} > 0$. Для чего нужно решать систему неравенств. Кроме того на каждой итерации следует задавать параметр $\alpha^{(k)} \in [0,1]$ так, чтобы неравенства этой системы не нарушались.  
+\begin{figure}[!h]
+\begin{myalgorithmic}[1]
+\Function{ChooseAlpha}{$\vec N_0, V, \vec \xi,\Delta \vec \xi$}
+\State $\beta = 0.5$ \Comment {Множитель, обеспечивающий строгое условие $N > 0$}
+\State $\alpha = 1 / \beta$
+\State $\vec N = \vec N_0 + V \vec \xi$ \Comment {Значение концентраций на текущей итерации}
+\State $\Delta \vec N = V \Delta \vec \xi$ \Comment {Поправка к концентрациям}
+\For {$i = \overline{1,n}$} 
+\If {$N_i + \alpha \Delta N_i < 0$}\Comment {Возможно лишь при $\Delta N_i < 0$}
+\State $\alpha = -\frac{N_i}{\Delta N_i}$ \Comment {Уменьшаем $\alpha$}
+\EndIf
+\EndFor
+\State \Return $\beta \cdot \alpha$
+\EndFunction
+\end{myalgorithmic}
+\caption{Алгоритм выбора множителя шага $\alpha$}
+\end{figure}
 
-\begin{verbatim}
- def choose_a(N0, V, reactionDepth, C):
-    safe = 0.5
-    a = 1 / safe
-    N = N0 + V.dot(reactionDepth)
-    dN = V.dot(C)
-    for i in range(len(N)):
-    	if (N[i] + a * dN[i] < 0):
-    	a = -N[i]/dN[i]
-    return a * safe
-\end{verbatim}
+Алгоритм выбора параметра $\alpha$ устроен таким образом, чтобы гарантировать выполнение условий:
+\begin{itemize}
+\item $\alpha \in (0, 1]$.
+\item Для каждой компоненты $i$ выполняется условие $N_i + \alpha \Delta N_i > 0$, причем неравенство выполняется <<с запасом>>.
+\item Если для каждой компоненты $i$ условие $N_i + \Delta N_i > 0$ выполнено с запасом, то значение $\alpha$ в точности равно 1, т.е. метод превращается в обычный метод Ньютона.
+\end{itemize}
+
+\subsection{Расширенная система}
 
 Перепишем систему в другом виде, для этого введём дополнительные переменные $$\vec{p} = \ln{(\vec{N}^0 + V\vec{\xi})}$$ 
 
